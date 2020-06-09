@@ -44,11 +44,10 @@ public class SorteoRestController {
 
 	}
 	
-
+	
 	@GetMapping("/ganadores")
-	public List<Persona> ganador() {
-		
-		
+	public List<Persona> sorteo() {
+				
 		List<Premio> premios=premioService.findAll();
 		
 		boolean bandera=false;
@@ -57,10 +56,10 @@ public class SorteoRestController {
 			
 			Premio premio=premios.get(i);
 			
-			int totalDePremios= PersonaPremioService.cantidadDePremios(i);
-			int premiosDisponibles=premio.getCantidad()-totalDePremios;
+			//int totalDePremios= PersonaPremioService.cantidadDePremios(i);
+			int premiosDisponibles=premios.get(i).getCantidad();
 			
-			if (premiosDisponibles>=0) {
+			if (premiosDisponibles>0) {
 				for(int x=0;x<premiosDisponibles;x++) {
 					
 					List<Persona> personasSinPremios=personaService.personasSinPremio();
@@ -71,57 +70,27 @@ public class SorteoRestController {
 				    PersonaPremio personaPremio= new PersonaPremio();
 				    
 				    personaPremio.setIdPersona(randomElement.getId());		
-				    personaPremio.setIdPremio(premio.getCodigo());
+				    personaPremio.setIdPremio(premios.get(i).getCodigo());
 				    PersonaPremioService.save(personaPremio);
 				    bandera=true;
 				}
+				
 			}
 			
 		}
+		
 		if (bandera=false) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No hay premios");
 			
 		}else {
+			for(int i=0; i<premios.size();i++) {
+				premios.get(i).setCantidad(0);
+			}
 			return personaService.personaConPremio();
 		}
 		
 		
-		/*
-		int encontrado = 0;
-
-		for (int i = 0; i < premioService.findPremios().size(); i++) {
-
-			int nroAleatorio, premio;
-			int n = premioService.findPremios().get(i);
-
-			if (premioService.cantidad(n) > 0) {
-
-				boolean bandera = false;
-				while (!bandera) {
-					nroAleatorio = (int) (Math.random() * personaService.totalPersonas().size() + 1);
-
-					premio = (int) personaService.ganador(nroAleatorio);
-
-					if (premio > 0) {
-					} else {
-
-						Persona personaActual = personaService.findById(nroAleatorio);
-						
-						
-						bandera = true;
-
-					}
-
-				}
-				encontrado = 1;
-			} else {
-
-			}
-
-		}
-		if (encontrado==0) {
-			System.out.println("no hay regalos disponibles");
-		}¨¨¨*/
+		
 	}
 
 }
